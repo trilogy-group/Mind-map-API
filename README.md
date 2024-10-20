@@ -48,10 +48,10 @@ else:
 
 ## HTML Demo
 
-This repository includes an HTML file (`index.html`) that demonstrates how to use the API with JavaScript. To use the demo:
+This repository includes an HTML file (`demo.html`) that demonstrates how to use the API with JavaScript. To use the demo:
 
 1. Clone this repository.
-2. Open `index.html` in a web browser.
+2. Open `demo.html` in a web browser.
 3. Click the "Generate Mind Map" button to send a request to the API with hardcoded data.
 4. The generated mind map will be displayed on the page in Markdown format.
 
