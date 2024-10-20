@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Map Generator API Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #response,
+        #markdown {
+            white-space: pre-wrap;
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .copy-button {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+
+        .copy-button:hover {
+            background-color: #007B9A;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Mind Map Generator API Demo</h1>
+    <form id="mindMapForm">
+        <label for="course_title">Course Title:</label>
+        <input type="text" id="course_title" name="course_title" value="Introduction to Python Programming" required>
+
+        <label for="key_concepts">Key Concepts:</label>
+        <textarea id="key_concepts" name="key_concepts"
+            required>Variables, Data Types, Control Structures, Functions, Object-Oriented Programming</textarea>
+
+        <label for="granularity_level">Granularity Level:</label>
+        <select id="granularity_level" name="granularity_level" required>
+            <option value="Overview">Overview</option>
+            <option value="Detailed Overview" selected>Detailed Overview</option>
+            <option value="Comprehensive Breakdown">Comprehensive Breakdown</option>
+            <option value="In-Depth Analysis">In-Depth Analysis</option>
+            <option value="Exhaustive Detail">Exhaustive Detail</option>
+        </select>
+
+        <label for="course_duration">Course Duration:</label>
+        <select id="course_duration" name="course_duration" required>
+            <option value="1 week">1 week</option>
+            <option value="2 weeks">2 weeks</option>
+            <option value="1 month" selected>1 month</option>
+            <option value="3 months">3 months</option>
+            <option value="6 months">6 months</option>
+            <option value="1 year">1 year</option>
+        </select>
+
+        <label for="target_audience">Target Audience:</label>
+        <input type="text" id="target_audience" name="target_audience" value="Beginners" required>
+
+        <label for="learning_objectives">Learning Objectives:</label>
+        <textarea id="learning_objectives" name="learning_objectives"
+            required>Understand basic Python syntax, Write simple Python programs, Implement basic algorithms</textarea>
+
+        <button type="submit">Generate Mind Map</button>
+    </form>
+
+    <div id="loading">Generating mind map... Please wait.</div>
+
+    <h2>API Response:</h2>
+    <pre id="response"></pre>
+    <button id="copyMarkdown" class="copy-button" style="display: none;">Copy Markdown</button>
+    <h2>Markdown:</h2>
+    <div id="markdown"></div>
+
+
+    <script>
+        let generatedMarkdown = '';
+
+        document.getElementById('mindMapForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const apiUrl = 'https://mind-map-api-yn7x.onrender.com/generate-mindmap/';
+            const formData = new FormData(this);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('response').textContent = '';
+            document.getElementById('markdown').innerHTML = '';
+            document.getElementById('copyMarkdown').style.display = 'none';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData),
+                });
+
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('markdown').innerHTML = marked.parse(data.markdown);
+                document.getElementById('copyMarkdown').style.display = 'block';
+                generatedMarkdown = data.markdown;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('response').textContent = 'An error occurred while generating the mind map.';
+            }
+        });
+
+        document.getElementById('copyMarkdown').addEventListener('click', function () {
+            navigator.clipboard.writeText(generatedMarkdown).then(function () {
+                alert('Markdown copied to clipboard!');
+            }, function (err) {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    </script>
+</body>
+
+</html>
